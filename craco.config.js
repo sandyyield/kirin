@@ -10,9 +10,8 @@ module.exports = {
             options: {
                 lessLoaderOptions: {
                     lessOptions: {
-                        // modifyVars: { '@primary-color': '#1DA57A' },
                         modifyVars: getThemeVariables({
-                            dark: true
+                            dark: true //开个暗夜模式 看着帅一点,就是有点太黑了
                         }),
                         javascriptEnabled: true,
                     },
