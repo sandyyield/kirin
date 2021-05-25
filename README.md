@@ -44,6 +44,10 @@
 + Redis
 
 
+#### 稍微记录一些特殊问题
+ >   *Failed to connect to 127.0.0.1 port 1081: Connection refused*
+
+
 # 项目结构
 ## *1.* 路由
 
