@@ -64,6 +64,7 @@ module.exports = override(
 # 相关依赖(包括但不限于,有的可能忘记罗列了)
 ## 前端:
 * React全家桶
+* TypeScript
 >   react-router-dom,react-redux
 * redux
 >   redux,react-redux,redux-thunk
@@ -71,6 +72,7 @@ module.exports = override(
 * antd
 * echarts
 * react-draft-wysiwyg
+
 
 ### **以下项目可以去我的其他repository查看,目前就不放在这里**
 ## 前台:
@@ -90,7 +92,18 @@ module.exports = override(
  >   *Failed to connect to 127.0.0.1 port 1081: Connection refused*
 
 
-# 项目结构
+# 一些说明
+> 感觉review代码检查起来太费事了,加个Typescript完事了
 ## *1.* 路由结构
 
-
+## 引入TS产生的一些问题:
+  + 为当前项目引入TypeScript 
+     > **yarn add --dev typescript**
+  + 自己手动创建一个**tsconfig.json** 或者执行 **yarn run tsc --init**自动生成
++ 2021年5月26日 :
+  - 重新安装一下ts的react-router-dom依赖即可 
+  > Could not find a declaration file for module 'react-router-dom'. 'D:/kirin/kirin/node_modules/react-router-dom/index.js' implicitly has an 'any' type.     
+  Try `npm i --save-dev @types/react-router-dom` if it exists or add a new declaration (.d.ts) file containing `declare module 'react-router-dom';`  TS7016
+  解决: **yarn add @types/react-router-dom**
+  
++ 好像类似的小问题还不少,有点麻烦

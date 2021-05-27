@@ -1,10 +1,10 @@
 import React from 'react'
-import { connect } from 'react-redux'
+// import * as ReactRedux from 'react-redux'
 import { Form, Input, Button, Checkbox, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import './css/login.less'
 
-import { test } from '../../redux/actions/test'
+// import * as Actions from '../../redux/actions'
 
 /*
     登录页面
@@ -13,9 +13,8 @@ import { test } from '../../redux/actions/test'
 //antd Form组件
 const NormalLoginForm = () => {
 
-    const onFinish = values => {
+    const onFinish = (values:any) => {
         message.success(`fetch request:${values.username} login`);
-        
     }
 
     return (
@@ -96,14 +95,14 @@ const Login = () => {
     )
 }
 
-// export default Login;
+export default Login;
 
-export default connect(
-    state => ({demo:state.test}),
-    {
-        test
-    }
-)(Login)
+// export default ReactRedux.connect(
+//     state => ({demo:state}),
+//     {
+//         test
+//     }
+// )(Login)
 
 
 

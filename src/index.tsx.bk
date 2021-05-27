@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
-import { Provider } from 'react-redux' //注意顶级组件
+// import { BrowserRouter } from 'react-router-dom';
+import * as ReactRouterDom from 'react-router-dom';
+import * as ReactRedux from 'react-redux' //注意顶级组件
 import store from './redux/store'
 
 
@@ -9,11 +10,12 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
-  <Provider store={store}>
-    <BrowserRouter>
+  //顶级Provider 直接传递一个store
+  <ReactRedux.Provider store={store}>
+    <ReactRouterDom.BrowserRouter>
       <App />
-      </BrowserRouter>
-  </Provider>,
+      </ReactRouterDom.BrowserRouter>
+  </ReactRedux.Provider>,
   document.getElementById('root')
 );
 
