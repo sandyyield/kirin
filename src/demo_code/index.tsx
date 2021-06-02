@@ -1,4 +1,5 @@
-import { worker } from "cluster";
+// import { worker } from "cluster";
+// import React from "react";
 import React from "react";
 
 //尽量用lamda方式来来coding吧  react的支持还算不错
@@ -341,11 +342,15 @@ export const PrototypicalDemo: React.FC<{}> = () => {
     const handle = () => {
         //new 操作符 过程  new 一个对象 然后把这个对象的prototype指向 相应对象的prototype(如Emplyee.prototype)
         //然后把此对象执行prototype object link 上的构造方法
-        // let jim = new Employee();
-        // let sally = new Manager();
-        // let mark = new Worker();
-        // let fred = new Sales();
-        // let jane = new Engineer();
+        let jim = new Employee();
+        let sally = new Manager();
+        let mark = new Worker();
+        let fred = new Sales();
+        let jane = new Engineer();
+
+        let set = { jim, sally, mark, fred, jane };
+
+        console.log({ ...set });
 
 
         // console.log(mark);
@@ -364,6 +369,180 @@ export const PrototypicalDemo: React.FC<{}> = () => {
 
 
 
+
+//#endregion
+
+//#region  this 指向问题  参考https://yehudakatz.com/2011/08/11/understanding-javascript-function-invocation-and-this/
+
+export const FunctionAboutThis: React.FC<{}> = () => {
+
+    interface Card {
+        suit: string;
+        card: number;
+    }
+
+    interface Deck {
+        suits: Array<string>;
+        cards: Array<number>;
+        createCardPicker(this: Deck): () => Card; //这种方式提前指定this为Deck类型
+    }
+
+
+    let deck = {
+        suits: ["hearts", "spades", "clubs", "diamonds"],
+        cards: Array(52),
+        createCardPicker: function (this: Deck) { //这种情况this 是any状态
+            return () => {
+                let pickedCard = Math.floor(Math.random() * 52);
+                let pickedSuit = Math.floor(pickedCard) / 13;
+                // console.log(`typeof this : ${typeof(this)}`);
+                return { suit: this.suits[pickedSuit], card: pickedCard % 13 };
+            }
+        }
+    }
+
+    const handleClick = () => {
+        let pickedCard = deck.createCardPicker()();
+        console.log(`card: ${pickedCard.card} , of ${pickedCard.suit}`);
+    }
+
+
+    return (
+        <h1 onClick={handleClick}>FunctionAboutThis</h1>
+    );
+}
+
+
+//this参数在回调函数里  //这个例子后面再回过来看 暂时用不到封装库
+export const FunctionAboutThis2: React.FC<{}> = () => {
+
+
+    // interface UIElement {
+    //     addClickListener(onClick: (this: void, e: Event) => void): void;
+    // }
+
+    // class Handler {
+    //     info: any;
+    //     onClickBad(this: Handler, e: Event){
+    //         this.info = e;
+    //     }
+    // }
+
+    // let h = new Handler();
+
+    // UIEvent
+
+    const handleClick = () => {
+
+    }
+
+    return (
+        <h1 onClick={handleClick}>FunctionAboutThis2</h1>
+    );
+}
+
+//重载
+export const FunctionAboutThis3: React.FC<{}> = () => {
+
+    // let suits = ["hearts", "spades", "clubs", "diamonds"];
+
+    //传统的js重载(当然要去掉这个any 这里为了过TS的语法 直接用js应该去掉这个any)
+    // function pickCard(x: any): any {
+
+    //     if (typeof x == "object") {
+    //         return Math.floor(Math.random() * x.length);
+    //     }
+    //     else if (typeof x == "number") {
+    //         let pickedSuit = Math.floor(x / 13);
+    //         return { suit: suits[pickedSuit], card: x % 13 };
+    //     }
+    // }
+
+    //TS 的重载 需要预先声明   但是这里好像有点问题  后面再讨论重载这种情况吧
+    // interface SuitObj {
+    //     suit: string;
+    //     card: number;
+    // }
+    // function pickCard(x: Array<SuitObj>): number;
+    // function pickCard(x: number): number;
+
+    // function pickCard(x): any {
+
+    //     if (typeof x == "object") {
+    //         return Math.floor(Math.random() * x.length);
+    //     }
+    //     else if (typeof x == "number") {
+    //         let pickedSuit = Math.floor(x / 13);
+    //         return { suit: suits[pickedSuit], card: x % 13 };
+    //     }
+    // }
+
+    // let myDeck = [{ suit: "diamonds", card: 2 }, { suit: "spades", card: 10 }, { suit: "hearts", card: 4 }];
+    // let pickedCard1 = myDeck[pickCard(myDeck)];
+    // alert("card: " + pickedCard1.card + " of " + pickedCard1.suit);
+
+    // let pickedCard2 = pickCard(15);
+    // alert("card: " + pickedCard2.card + " of " + pickedCard2.suit);
+
+
+    // let suits = ["hearts", "spades", "clubs", "diamonds"];
+
+
+    // interface obj {
+    //     suit: string; card: number;
+    // }
+
+
+    // function pickCard(x: Array<obj>): number;
+    // function pickCard(x: number): { suit: string; card: number; };
+
+
+
+    // let pickCard2 : (x: string | number | Array<string>) => any;
+
+
+
+    //关于匿名函数的重载   TODO...探究下是语法问题还是本身就不支持
+    // function pickCard(): any {
+    // const p: any => (x: any)  = (x) => {
+    // const pickCard: any = (x: any) => {
+    // const pickCard: (x: any) => any = x => {
+
+
+    //     // Check to see if we're working with an object/array
+    //     // if so, they gave us the deck and we'll pick the card
+    //     if (typeof x == "object") {
+    //         let pickedCard = Math.floor(Math.random() * x.length);
+    //         return pickedCard;
+    //     }
+    //     // Otherwise just let them pick the card
+    //     else if (typeof x == "number") {
+    //         let pickedSuit = Math.floor(x / 13);
+    //         return { suit: suits[pickedSuit], card: x % 13 };
+    //     }
+    // }
+
+    // let myDeck = [{ suit: "diamonds", card: 2 }, { suit: "spades", card: 10 }, { suit: "hearts", card: 4 }];
+    // let pickedCard1 = myDeck[pickCard(myDeck)];
+    // alert("card: " + pickedCard1.card + " of " + pickedCard1.suit);
+
+    // let pickedCard2 = pickCard(15);
+    // alert("card: " + pickedCard2.card + " of " + pickedCard2.suit);
+
+
+
+
+
+
+
+
+
+
+
+    return (
+        <h1>FunctionAboutThis3</h1>
+    );
+}
 
 //#endregion
 
@@ -395,13 +574,11 @@ export const FunctionDemo3: React.FC<{}> = () => {
     // }
 
 
-    //params方式接受形参
-    const add: (...vv: number[]) => number = (...v) => {
+    //params方式接受形参  剩余参数的运用
+    const add: (...vvvvv: number[]) => number = (...v) => {
         console.log('aaa', v);
         let ans: number = 0;
-        v.map(i => {
-            ans += i
-        });
+        v.map(i => ans += i);
         return ans;
     }
 
@@ -409,7 +586,7 @@ export const FunctionDemo3: React.FC<{}> = () => {
         // z = add(20)(30);
         // console.log(z);
 
-        console.log('handle : ', add(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+        console.log('handle : ', add(1, 2, 3, 4, 5, 6, 7, 8, 9, 10) + z)
     }
 
     return (
@@ -421,3 +598,277 @@ export const FunctionDemo3: React.FC<{}> = () => {
 
 
 //#endregion
+
+//#region  generics 
+//泛型
+export const GenericsDemo: React.FC<{}> = () => {
+
+
+
+    //定义泛型签名
+    // const identityFunc: <T>(arg: T) => T = function identity<T>(arg: T) { return arg; }
+    //可以 改为用签名对象的方式定义
+    // const identityFunc: { <T>(arg: T): T } = function identity<T>(arg: T) { return arg; }
+
+    //签名对象抽象成泛型接口
+    // interface IIdentityFunc {
+    //     <T>(arg: T): T
+    // }
+
+    //泛型接口跟进一步
+    interface IIdentityFunc<T> {
+        (arg: T): T
+    }
+    const identityFuncWithInterface: IIdentityFunc<number | string> = function identity<T>(p: T) { return p; }
+
+    interface IIdentityFunc2<T> {
+        ans: (p: T) => T;
+    }
+    const identityFuncWithInterface2: IIdentityFunc2<number> = { ans: (p) => p }
+
+
+
+
+    console.log(`identityFuncWithInterface : ${typeof identityFuncWithInterface("is string") == "number" ? "number" : "string"}`);
+    console.log(`identityFuncWithInterface2 : ${identityFuncWithInterface2.ans(12345.68)}`);
+
+    // console.log(identityFunc<string>("hahaha"));
+    // console.log(identityFunc2<string>("hhhh2"));
+
+
+
+    // interface GenericNumber<T> {
+    //     zeroValue: T;
+    //     add: (x: T, y: T) => T;
+    // }
+
+    //泛型类
+    class GenericNumberCls<T>{
+        //TypeScript 2.7引入了一个新的控制严格性的标记 --strictPropertyInitialization，确保每个实例的属性都会初始值 所以必须加割! 
+        zeroValue!: T;
+        add!: (x: T, y: T) => T
+    }
+
+    let myGenericNumber = new GenericNumberCls<number>();
+    myGenericNumber.zeroValue = 19527;
+    myGenericNumber.add = (x, y) => x + y;
+
+    let stringNumeric = new GenericNumberCls<string>();
+    stringNumeric.zeroValue = "zero";
+    stringNumeric.add = (x, y) => `string:${x} + ${y}`;
+
+    console.log(stringNumeric.add(stringNumeric.zeroValue, "test"));
+    console.log(myGenericNumber.add(myGenericNumber.zeroValue, 9527));
+
+
+
+    //泛型约束
+    interface LengthWise {
+        length: number;
+    }
+
+    const loggingIdentity: <T extends LengthWise>(arg: T) => T = (arg) => { console.log(arg.length); return arg }
+
+
+    // console.log(loggingIdentity(3)) //定义了泛型约束 没有length属性过不了类型检查
+    console.log(loggingIdentity([1, 2, 3, 12]));
+    return (
+        <h1>GenericsDemo</h1>
+    );
+}
+
+//#endregion
+
+
+//#region enum
+
+
+
+export const EnumDemo: React.FC<{}> = () => {
+
+    // enum Direction {
+    //     Up,
+    //     Down,
+    //     Left,
+    //     Right
+    // }
+
+    enum E {
+        x = 2
+    }
+
+    const handle = () => {
+        // console.log(Direction.Up);
+
+        let a = E.x;
+        console.log(E[a]);
+
+    }
+
+
+
+    return (
+        <h1 onClick={handle}>EnumDemo</h1>
+    );
+}
+
+
+//#endregion
+
+//#region 类型推断
+export const TypeDemo: React.FC<{}> = () => {
+
+    // let x = [0,1,null]; //类型推断算法推断为 number | null
+    // x.push("123") //error 
+
+
+    // window.onmousedown = function (e: any) {
+    //     console.log("mouse down -->", e.button);
+    // }
+
+
+
+
+
+
+
+
+    return (
+        <>
+            <h1>TypeDemo</h1>
+            <button>TypeDome</button>
+        </>
+    );
+}
+
+
+//#endregion
+
+//#region 类型兼容性
+
+
+export const TypeDemo2: React.FC<{}> = () => {
+
+    // interface Named{
+    //     name:string;
+    // }
+
+    // class Person{
+    //     name!: string;
+    // }
+
+
+    // let p:Named;
+
+    // p = new Person();
+
+    // let x : Named;
+    // let y = {name:"hello",location:"123"};
+    // x = y; //因为y包含了x 约束的interface Named 所以这里类型检查不出错   : 原理是是递归检查所有约束接口的类型,不检查约束接口之外的
+
+
+    // console.log(x);
+
+
+
+    //函数参数双向协变
+    // enum EventType {
+    //     Mouse,
+    //     Keyboard
+    // }
+
+    // interface Event { timestamp: number }
+    // interface MouseEvent extends Event { x: number, y: number }
+    // interface KeyEvent extends Event { keyCode: number };
+
+    // const listenEvent = (eventType: EventType, handler: (n: Event) => void)
+    // {
+    //     //...
+    // }
+
+    //类型别名  好像跟c++里面的结构体类似?
+    // type Name = string;
+    // type NameResolver = () => string;
+    // type NameOrResolver = Name | NameResolver;
+    // function getName(n: NameOrResolver): Name {
+    //     if (typeof n === 'string') {
+    //         return n;
+    //     }
+    //     else {
+    //         return n();
+    //     }
+    // }
+
+    // let count = 0;
+    // const handle = () => {
+    //     if (count++ % 2 === 0) {
+    //         console.log(getName(() => `${count}`));
+    //     }
+    //     else {
+    //         console.log(getName(`${count * 100}`));
+    //     }
+    // }
+
+
+    //字面量约束Easing的值  
+    type Easing = "a" | "b" | "c";
+
+    // let f: (x: Easing) => number;//= (x) => 9527;
+    const handle = () => {
+
+        // f("a"); 
+        //f("aa")  error
+
+        let res = ((x: Easing): number => 9527)("b")
+        console.log(res);
+
+
+    }
+
+
+
+
+
+
+    return (
+        <h1 onClick={handle}>TypeDemo2</h1>
+    );
+}
+
+
+
+
+export const TypeDemo3 = () => {
+
+    const [count, setcount] = React.useState(0)
+    // React.useEffect(() => setcount(i => {
+    //     if (i < 100) {
+    //         console.log(i);
+    //         const timer = setInterval(() => {
+    //             // debugger
+    //             i++;
+    //         }, 500)
+    //         // debugger
+    //         return () => {
+    //             clearInterval(timer)
+    //         }
+    //     }
+    //     return i;
+    // }), [count]);
+
+    // const handle = () => {
+    //     setcount(i => i + 1);
+    //     console.log(count);
+    // }
+
+    // return (
+    //     <h1 onClick={handle}>TypeDemo3</h1>
+    // );
+}
+
+
+
+
+//#endregion
+
+
