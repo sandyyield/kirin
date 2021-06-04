@@ -12,7 +12,7 @@
     "noImplicitAny": true,
     "baseUrl": "src",
     "esModuleInterop": true,
-    "experimentalDecorators": true,
+    "experimentalDecorators": true, //实验性的装饰器特性 好东西 减少大量重复代码
     "allowJs": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,

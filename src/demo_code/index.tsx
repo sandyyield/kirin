@@ -1,6 +1,6 @@
 // import { worker } from "cluster";
 // import React from "react";
-import React from "react";
+import React, { FC, useEffect, useState } from "react";
 
 //尽量用lamda方式来来coding吧  react的支持还算不错
 // 外部引用调试尽量跟验证的特性保持一致 这里可能是比较长的一个复用组件
@@ -841,6 +841,9 @@ export const TypeDemo2: React.FC<{}> = () => {
 export const TypeDemo3 = () => {
 
     const [count, setcount] = React.useState(0)
+    useEffect(() => {
+        console.log('parent change:', count)
+    }, [count])
     // React.useEffect(() => setcount(i => {
     //     if (i < 100) {
     //         console.log(i);
@@ -864,11 +867,208 @@ export const TypeDemo3 = () => {
     // return (
     //     <h1 onClick={handle}>TypeDemo3</h1>
     // );
+
+    return (
+        <>
+            <h1 onClick={() => setcount(() => count + Math.floor(Math.random() * 10))}>click</h1>
+            <SeniorTypesDemo x={count}>12321</SeniorTypesDemo>
+        </>
+    )
 }
 
 
 
 
 //#endregion
+
+//#region 高级类型
+
+export const SeniorTypesDemo: React.FC<{ x: number }> = (p) => {
+
+    let [count, setCount] = useState(0);
+
+    useEffect(() => {
+        console.log('effect', count, p);
+    }, [count, p]);
+
+    console.log(`props is : ${p}`);
+
+
+
+    const handle = () => {
+
+        setCount(() => {
+            return count + Math.floor(Math.random() * 100)
+        });
+
+    }
+
+
+    return (
+        <h1 onClick={handle}>SeniorTypesDemo</h1>
+
+    );
+}
+
+//#endregion
+
+//#region  Union Types
+
+export const UnioTypesDemo: FC<{}> = () => {
+
+    //number | string 联合连携  number & string 交叉类型
+    const padLeft: (x: string, y: number | string | Array<number>) => string = (v, p) => {
+        //TS中用typeof断言类型 能直接启用类型保护检查
+        if (typeof p === "number") {
+            return Array(p + 1).join(" ") + v;
+
+        }
+        if (typeof p === "string") {
+            return p + v;
+        }
+        console.log(p instanceof Array);
+        if (typeof p === "object") {
+            return "123123";
+        }
+        console.log('err');
+        throw new Error('error');
+
+    }
+
+    // padLeft("Hello world", 4); // returns "    Hello world"
+    // padLeft("hello,world", true); // 编译阶段通过，运行时报错 ps:非联合类型情况 联合类型 编译阶段直接检查出来了
+    padLeft("hhhh", [1, 2, 4]);
+
+
+
+    interface Bird {
+        fly: () => void;
+        layEggs: () => void;
+    }
+
+    interface Fish {
+        swim: () => void;
+        layEggs: () => void;
+    }
+
+    function getSmallPet(): Fish | Bird {
+        // ...
+        return { fly: () => console.log("fly"), layEggs: () => console.log("bird layeggs") };
+    }
+
+    // 类型保护与区分类型（Type Guards and Differentiating Types）
+
+    // const isFish(pet:Fish | Bird):pet is Fish{
+    //     return ()
+    // }
+
+    let pet = getSmallPet();
+    pet.layEggs();
+    //这种方式 TSX不认  所以要用as的方式
+    // if ((<Fish>pet).swim) {
+    //     (<Fish>pet).swim();
+    // }
+
+    if ((pet as Fish).swim) {
+        (pet as Fish).swim();
+    }
+
+
+    //每一个成员访问都会
+
+    return (
+        <h1>UnioTypesDemo</h1>
+    );
+}
+
+
+//#endregion
+
+
+
+//#region IndexTypes //这个好像是一个不错的语法糖
+
+export const IndexTypesDemo: React.FC<{}> = () => {
+
+    // function pluck1<T, K extends keyof T>(o: T, names: K[]): T[K][] {
+    //     return names.map(n => o[n]);
+    // }
+
+    const pluck: <T, K extends keyof T>(a: T, b: K[]) => T[K][] = (o, names) => names.map(n => o[n]);
+
+    interface Person {
+        name: string;
+        age: number;
+    }
+
+    let person: Person = { name: 'tom', age: 35 };
+
+    let strings: string[] = pluck(person, ['name']); //这里编译器会检查是否为Person的一个属性
+
+    strings.map(i => console.log(i));
+
+
+    return (
+        <h1>IndexTypesDemo</h1>
+    );
+}
+
+
+//#endregion
+
+
+//#region Symbols
+
+export const SymbolsDemo = () => {
+
+    //Symbols是不可改变且唯一的。
+    let sym = Symbol();
+
+    let obj = {
+        [sym]: "value"
+    }
+
+    // console.log(obj[sym]);
+
+
+    return (
+        <h1>SymbolsDemo</h1>
+    );
+}
+
+//#endregion
+
+
+//#region Decorators
+
+const DecoratorsDemo = () => {
+    const sealed = (target: any) => console.log(`Decorators log is ${target}`);
+
+    @sealed
+    class Greeter {
+        greeting: string;
+        constructor(message: string) {
+            this.greeting = message;
+        }
+        greet() {
+            return "Hello, " + this.greeting;
+        }
+    }
+
+    // @sealed
+    // function Gfc() {
+    //     const greet = () => {
+    //         return "hello,this is gfc";
+    //     }
+    // }
+
+
+    return <h1>DecoratorsDemo</h1>
+}
+
+
+
+//#endregion
+
 
 
